@@ -1,0 +1,63 @@
+################################################################################
+#
+# RevBayes Example: Total-evidence dating under the fossilized birth-death model
+#
+# This file: Runs the full MCMC ...
+#
+# authors: Tracy A. Heath, Walker C. Pett, April M. Wright
+#
+################################################################################
+
+#######################
+# Reading in the Data #
+#######################
+# Create the full list of taxa (including all fossils and extant species #
+taxa <- readTaxonData("1/ages.tsv")
+
+# Import the morphological character matrix #
+# this file contains only the taxa for which morphological characters are available #
+morpho <- readDiscreteCharacterData("1/morphology.nex")
+
+morpho.addMissingTaxa( taxa )
+
+
+## helpers
+moves = VectorMoves()
+monitors = VectorMonitors()
+
+n_taxa <- taxa.size()
+n_branches <- 2 * n_taxa - 2
+# Load the model files
+source("1/model_FBDP_TEFBD.Rev") # FBD tree prior
+
+#source("1/model_UExp_TEFBD.Rev") # UExp relaxed clock
+
+source("1/model_Morph_TEFBD.Rev") # Morphological character change model
+
+
+########
+# MCMC #
+########
+
+# initialize the model object #
+mymodel = model(fbd_tree)
+# Create a vector of monitors #
+# 1. for the full model #
+monitors.append( mnModel(filename="1/skyline.log", printgen=10))
+## Checkpoint addition ##
+monitors.append(mnStochasticVariable(filename="1/mcmc-stoch.log", printgen=10))
+#trace = readStochasticVariableTrace(file="1/mcmc-stoch.log")
+#mymcmc.initializeFromTrace(trace)
+# 2. the tree #
+monitors.append( mnFile(filename="1/skyline.trees", printgen=10, fbd_tree))
+# 3. and a few select parameters to be printed to the screen #
+monitors.append( mnScreen(printgen=10,  num_samp_anc, origin_time))
+#monitors.append( mnScreen(printgen=10)
+# Initialize the MCMC object #
+mymcmc = mcmc(mymodel, monitors, moves)
+
+# Run the MCMC #
+mymcmc.run(generations=2000000)
+
+# Quit RevBayes #
+q()

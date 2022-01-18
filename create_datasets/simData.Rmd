@@ -1,0 +1,64 @@
+---
+title: "Simulate Data Sets"
+author: "April Wright"
+date: "1/17/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Simulate the FBD trees
+
+
+```{r}
+lambda = .5
+mu = 0.2
+psi = .1
+tips = 100
+trees = c()
+num = 1
+
+while (num < 100){
+t = FossilSim::sim.fbd.age(numbsim = 1, lambda = lambda, mu = mu, psi = psi, age = 10)
+t
+trees = c(trees, t)
+num = num + 1
+}
+```
+
+## Simulate fossils
+```{r}
+beta = 0.5
+lambda.a = 1.2
+num=1
+rate = 1
+for (t in trees) {
+s = sim.taxonomy(tree = t, beta = beta, lambda.a = lambda.a)
+f = sim.fossils.poisson(rate = rate, taxonomy = s)
+f <- data.frame(f)
+f <- f %>% 
+  mutate(min = hmin) %>% 
+  mutate(max = hmax) %>% 
+  mutate(taxon = edge) %>% 
+  select(taxon, min, max) %>% 
+  distinct(taxon, .keep_all = TRUE)
+
+file_string <- paste0(num, "/ages.tsv")
+tree_string <-paste0( num,  "/tree.nex")
+extra_ages <- data.frame(t$tip.label)
+extra_ages <- extra_ages %>% 
+  mutate(min= 0.0) %>% 
+  mutate(taxon = t.tip.label) %>% 
+  mutate(max = 0.0)  %>% 
+  select(taxon, min, max) 
+
+ new <- rbind(f, extra_ages)
+
+write_delim(new, file_string, delim  = "\t")
+ape::write.tree(t, tree_string)
+num = num+1
+}
+```
+
