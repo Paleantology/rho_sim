@@ -1,0 +1,22 @@
+
+######################
+# Species-Tree model #
+######################
+reps <- 100
+for (i in 1:reps)
+{
+tree_file <- i + "/tree.nex"
+starting_tree <- readBranchLengthTrees(tree_file)[1]
+taxa <- starting_tree.taxa()
+
+Q <- fnJC(2)
+
+ alpha_morpho ~ dnExponential( 1.0 )
+ rates_morpho := fnDiscretizeGamma( alpha_morpho, alpha_morpho, 4 )
+
+
+seq ~ dnPhyloCTMC(tree=starting_tree, siteRates=rates_morpho, Q=Q, type="Standard",  nSites=200)
+name <-  i + "/morphology.nex"
+writeNexus(filename=name, seq)
+seq.redraw()
+}

@@ -43,13 +43,13 @@ source("model_Morph_TEFBD.Rev") # Morphological character change model
 mymodel = model(fbd_tree)
 # Create a vector of monitors #
 # 1. for the full model #
-monitors.append( mnModel(filename="1/skyline.log", printgen=10))
+monitors.append( mnModel(filename="skyline.log", printgen=10))
 ## Checkpoint addition ##
-monitors.append(mnStochasticVariable(filename="1/mcmc-stoch.log", printgen=10))
+monitors.append(mnStochasticVariable(filename="mcmc-stoch.log", printgen=10))
 #trace = readStochasticVariableTrace(file="1/mcmc-stoch.log")
 #mymcmc.initializeFromTrace(trace)
 # 2. the tree #
-monitors.append( mnFile(filename="1/skyline.trees", printgen=10, fbd_tree))
+monitors.append( mnFile(filename="skyline.trees", printgen=10, fbd_tree))
 # 3. and a few select parameters to be printed to the screen #
 monitors.append( mnScreen(printgen=10,  num_samp_anc, origin_time))
 #monitors.append( mnScreen(printgen=10)
